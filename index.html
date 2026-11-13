@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#101623" />
+  <title>京都雪庭 · 雪見私湯</title>
+  <meta name="description" content="一座可旋转的京都雪庭微缩模型：雪见私汤、木构雪庵与冬夜灯火。" />
+  <link rel="stylesheet" href="./styles/main.css" />
+  <script>
+    window.__errors = [];
+    window.addEventListener('error', (event) => {
+      window.__errors.push(`${event.message} @ ${event.filename}:${event.lineno}:${event.colno}`);
+    });
+    window.addEventListener('unhandledrejection', (event) => {
+      window.__errors.push(`Promise: ${String(event.reason && event.reason.stack || event.reason)}`);
+    });
+    const __consoleError = console.error.bind(console);
+    console.error = (...args) => {
+      window.__errors.push('console: ' + args.map((a) => String(a && a.stack || a)).join(' '));
+      __consoleError(...args);
+    };
+  </script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./vendor/three.module.js",
+        "three/addons/": "./vendor/addons/"
+      }
+    }
+  </script>
+</head>
+<body class="ui-dusk is-loading">
+  <div id="app">
+    <canvas id="scene" aria-label="可旋转的京都雪庭三维微缩场景"></canvas>
+
+    <div class="atmosphere" aria-hidden="true">
+      <div class="grade"></div>
+      <div class="vignette"></div>
+      <div class="grain"></div>
+      <div class="onsen-mist"></div>
+    </div>
+
+    <header class="brand">
+      <div class="brand-main">
+        <span class="brand-jp">京都雪庭</span>
+        <span class="seal" aria-hidden="true">雪</span>
+      </div>
+      <div class="brand-sub">雪見私湯</div>
+      <div class="brand-en">KYOTO SNOW GARDEN · A PRIVATE ONSEN</div>
+    </header>
+
+    <button class="reset-btn" id="resetView" type="button" aria-label="回到初始视角" title="回到初始视角">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20 11a8 8 0 1 0-2.34 5.66" />
+        <path d="M20 4v7h-7" />
+      </svg>
+      <span>归位</span>
+    </button>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <aside class="hints" aria-label="场景交互提示">
+      <div class="hint-leading">轻触场景</div>
+      <div class="hint-row">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v20M4.5 6.5l15 11M19.5 6.5l-15 11M8 4l4 2 4-2M8 20l4-2 4 2M4 10l2 4-2 4M20 10l-2 4 2 4"/></svg>
+        <span>点树枝 · 落雪</span>
+      </div>
+      <div class="hint-row">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4c0 3-3 4-3 8 0 3 2 5 5 5s5-2 5-5c0-4-3-5-3-8M17 10c0 2-2 3-2 5.5 0 2 1.5 3.5 3 3.5s3-1.5 3-3.5C21 13 19 12 19 10"/></svg>
+        <span>点雪地 · 留痕</span>
+      </div>
+      <div class="hint-row">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15c2-3 4-3 6 0s4 3 6 0 4-3 4 0M4 19c2-3 4-3 6 0s4 3 6 0 4-3 4 0M8 11c-1-4 2-7 4-7s5 3 4 7"/></svg>
+        <span>点温泉 · 入池</span>
+      </div>
+      <div class="hint-row">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21c4 0 7-3 5-8-1.2-3-5-4-5-8-1 4-6 5-6 9 0 4 2.6 7 6 7Z"/><path d="M12 21c-1.5-3-1-5 1-7"/></svg>
+        <span>点暖炉 · 添柴</span>
+      </div>
+    </aside>
+
+    <section class="time-panel" aria-label="时间与光线">
+      <div class="time-top">
+        <div class="time-title">
+          <span class="time-kana">刻</span>
+          <span class="time-caption">雪庭时刻</span>
+        </div>
+        <div class="presets" role="group" aria-label="预设时刻">
+          <button type="button" data-time="7" data-name="朝雪">朝雪<em>07:00</em></button>
+          <button type="button" data-time="18" data-name="暮色" class="active">暮色<em>18:00</em></button>
+          <button type="button" data-time="22" data-name="雪夜">雪夜<em>22:00</em></button>
+        </div>
+        <div class="time-readout">
+          <span class="clock" id="clockValue">18:00</span>
+          <span class="phase" id="phaseName">暮色</span>
+        </div>
+      </div>
+      <div class="slider-wrap">
+        <input id="timeSlider" type="range" min="0" max="24" step="0.02" value="18" aria-label="拖动调整一天中的时间" />
+        <div class="slider-ticks" aria-hidden="true"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div>
+      </div>
+    </section>
+
+    <div class="onsen-label" id="onsenLabel" hidden>
+      <span class="onsen-jp">雪見の湯</span>
+      <span class="onsen-sub">汤烟、落雪与一院灯火</span>
+    </div>
+
+    <button class="onsen-return" id="leaveOnsen" type="button" hidden>
+      <span>离池返回</span><kbd>ESC</kbd>
+    </button>
+
+    <div class="loader" id="loader">
+      <div class="loader-inner">
+        <div class="loader-mark">雪</div>
+        <div class="loader-title">京都雪庭</div>
+        <div class="loader-sub">雪見私湯 · KYOTO</div>
+        <div class="loader-line"><i></i></div>
+      </div>
+    </div>
+
+    <noscript>
+      <div class="noscript">请启用 JavaScript 以浏览这座雪庭。</div>
+    </noscript>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
